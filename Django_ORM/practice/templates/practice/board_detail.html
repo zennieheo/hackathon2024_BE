@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ board.name }}{% endblock %}
+
+{% block content %}
+    <div class="board-container">
+        <hr style="border: 2px solid black;">
+
+        <!-- 게시판 제목 및 설명 -->
+        <div class="board-header">
+            <h1>{{ board.name }}</h1>
+            <p>{{ board.description }}</p>
+        </div>
+
+        <!-- 게시물 목록 -->
+        <fieldset>
+            <legend>Posts</legend>
+            <ul class="posts-list">
+                {% for post in posts %}
+                    <li class="post-item">
+                        <a href="{% url 'post_detail' board.id post.id %}" class="post-link">{{ post.title }}</a>
+                        <span class="post-writer">by {{ post.writer }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </fieldset>
+
+        <!-- 페이지네이션 -->
+        <div class="pagination">
+            <span class="step-links">
+                {% if posts.has_previous %}
+                    <a href="?page=1">&laquo; first</a>
+                    <a href="?page={{ posts.previous_page_number }}">previous</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ posts.number }} of {{ posts.paginator.num_pages }}.
+                </span>
+
+                {% if posts.has_next %}
+                    <a href="?page={{ posts.next_page_number }}">next</a>
+                    <a href="?page={{ posts.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+
+        <br>
+
+        <!-- 액션 버튼들 -->
+        <div class="actions-section">
+            <a href="{% url 'new_post' board.id %}" class="btn btn-primary">Create New Post</a>
+            <a href="{% url 'index' %}" class="btn btn-secondary">Back to Board List</a>
+        </div>
+    </div>
+{% endblock %}

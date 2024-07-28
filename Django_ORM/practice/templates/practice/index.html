@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Boards{% endblock %}
+
+{% block content %}
+    <div class="board-container">
+        <!-- 상단 구분선 -->
+        <hr style="border: 2px solid black;">
+
+        <!-- 게시판 목록 섹션 -->
+        <fieldset>
+            <legend>Select a Board</legend>
+            <ul class="board-list">
+                {% for board in boards %}
+                    <li class="board-item">
+                        <a href="{% url 'board_detail' board.id %}" class="board-link">{{ board.name }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </fieldset>
+    </div>
+{% endblock %}

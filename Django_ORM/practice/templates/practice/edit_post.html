@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Post{% endblock %}
+
+{% block content %}
+    <div class="edit-post-container">
+        <hr style="border: 2px solid black;">
+
+        <!-- 게시물 수정 폼 -->
+        <fieldset>
+            <legend>Edit Post</legend>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <!-- 게시물 폼 필드들 -->
+                <div class="form-group">
+                    {{ post_form.as_p }}
+                </div>
+                
+                <br>
+
+                <!-- 이미지 업로드 섹션 -->
+                <fieldset>
+                    <legend>Upload New Images</legend>
+                    <div class="form-group">
+                        <input type="file" name="images" multiple class="form-control-file">
+                    </div>
+                </fieldset>
+                
+                <br>
+
+                <!-- 현재 이미지 목록 -->
+                <fieldset>
+                    <legend>Current Images</legend>
+                    <div class="form-group">
+                        {% for image in images %}
+                            <div class="current-image-item" style="margin-bottom: 10px;">
+                                <img src="{{ image.image.url }}" alt="Image" style="max-width: 200px; display: block; margin-bottom: 5px;">
+                                <label>
+                                    <input type="checkbox" name="delete_images" value="{{ image.id }}"> Delete
+                                </label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </fieldset>
+
+                <br>
+
+                <!-- 제출 버튼 -->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Save Changes</button>
+                </div>
+            </form>
+        </fieldset>
+
+        <br>
+
+        <!-- 내비게이션 버튼 -->
+        <a href="{% url 'board_detail' board.id %}" class="btn btn-primary">Back to Board</a>
+    </div>
+{% endblock %}
