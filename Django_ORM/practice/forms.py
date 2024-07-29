@@ -1,9 +1,10 @@
 from django import forms
 from .models import Post, Comment, Image
+from django.forms.models import inlineformset_factory
 
 
 class PostForm(forms.ModelForm):
-    # images = forms.FileField(widget=MultipleFileInput(attrs={'multiple': True}), required=False) 
+
     class Meta:
         model = Post
         fields = ['writer', 'title', 'content']
@@ -20,3 +21,10 @@ class CommentForm(forms.ModelForm):
         widgets = {
             'content': forms.Textarea(attrs={'rows': 2}),
         }
+
+
+class ImageFOrm(forms.ModelForm):
+    class Meta:
+        model = Image
+        fields = ['image']
+ImageFormSet = inlineformset_factory(Post, Image, form=ImageForm, extra=1)

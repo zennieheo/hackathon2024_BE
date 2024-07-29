@@ -43,4 +43,6 @@ class Image(models.Model):
     uploaded_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"Image {self.id}"
+        return f'Image {self.id} for post {self.post.title}'
+
+   

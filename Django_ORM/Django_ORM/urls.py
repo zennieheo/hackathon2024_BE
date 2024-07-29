@@ -23,11 +23,9 @@ urlpatterns = [
     path('schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),  # Swagger UI를 통해 API 문서를 시각화하는 URL
     path('schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),  # ReDoc을 통해 API 문서를 시각화하는 URL
 
-] 
+]
 
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-
 # + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

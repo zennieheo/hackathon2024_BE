@@ -23,13 +23,13 @@
                 <div class="post-images">
                     <h3>Images</h3>
 
-                    <div class="image-grid">
+                    
                         {% for image in post.images.all %}
                             <div class="image-item">
                                 <img src="{{ image.image.url }}" alt="Post Image" class="img-fluid">
                             </div>
                         {% endfor %}
-                    </div>
+                    
                 </div>
             {% endif %}
 
