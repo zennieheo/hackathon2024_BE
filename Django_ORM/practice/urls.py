@@ -23,4 +23,5 @@ urlpatterns = [
     path('post/<int:post_id>/delete/', 
          views.delete_post, 
          name='delete_post'),
+
 ]

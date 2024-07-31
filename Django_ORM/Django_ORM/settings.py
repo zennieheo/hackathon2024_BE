@@ -10,12 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
-from pathlib import Path
+from datetime import timedelta
 import os
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+# BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -24,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-82gi@p7&&lw=lw6l$t4+8ce3u5zi1a3a*tyi4=&050_vo(o+fa'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False  # 개발중에는 True로 설정, 실제 배포 환경에서는 False로 설정
+DEBUG = True  # 개발중에는 True로 설정, 실제 배포 환경에서는 False로 설정
 
 ALLOWED_HOSTS = ["*"]
 
@@ -39,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'rest_framework',
     'drf_spectacular',
+    'rest_framework_simplejwt',
     'practice',
     'corsheaders',
 ]
@@ -63,6 +65,10 @@ REST_FRAMEWORK = {
         'user': '1000/day',  # 인증 사용자
     },
 
+    'DEFAULT_AUTHENTICATION_CLASSES' : (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
@@ -72,9 +78,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'practice.authentication.APIKeyAuthentication',
     ),
-
-# JWT settings
-from datetime import timedelta
+"""
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # 액세스 토큰의 유효 기간
@@ -86,7 +90,6 @@ SIMPLE_JWT = {
     'VERIFYING_KEY': None,
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
-"""
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -104,7 +107,7 @@ ROOT_URLCONF = 'Django_ORM.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR / 'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -124,7 +127,7 @@ WSGI_APPLICATION = 'Django_ORM.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'), # os.path.join 사용
     }
 }
 
@@ -154,6 +157,14 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
+
+STATIC_URL = '/static/'
+STATIC_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+
+
+
 
 
 # Default primary key field type
@@ -204,7 +215,6 @@ CORS_ALLOW_METHODS = [
     'OPTIONS',
     'HEAD',
 ]
-
 
 
 

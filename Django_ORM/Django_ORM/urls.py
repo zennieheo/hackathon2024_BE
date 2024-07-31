@@ -2,19 +2,21 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+
 # from rest_framework import permissions ______ unused
 
 # Spectacular Document API URL 패턴
 from drf_spectacular.views import SpectacularAPIView, SpectacularJSONAPIView, SpectacularSwaggerView, SpectacularRedocView
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 
     # API URLs
-    path('api/', include('practice.api_urls')),
-
+    path('api/', include('practice.api_urls')), # practice/api_urls.py를 포함하여 API URL 설정
+    
     # Template view URLs
-    path('', include('practice.urls')),
+    path('', include('practice.urls')), # practice/urls.py를 포함하여 일반 웹 페이지 URL 설정
 
     # Spectacular Document API URL 패턴
     path("docs/json/", SpectacularJSONAPIView.as_view(), name="schema-json"),  # JSON 형식의 API 스키마를 제공하는 URL

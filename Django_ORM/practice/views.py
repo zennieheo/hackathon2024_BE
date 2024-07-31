@@ -1,17 +1,27 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate
+import uuid
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny, BasePermission
+from rest_framework import generics
+from rest_framework_simplejwt.tokens import RefreshToken
+
 
 from .models import Board, Post, Comment, Image, APIKey
 from .forms import PostForm, CommentForm, ImageForm
 from .serializers import BoardSerializer, PostSerializer, CommentSerializer, ImageSerializer
 
+
+class ProtectedView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return Response({'message': 'This is a protected view!'})
 
 # Custom permission class
 class IsOwnerOrReadOnly(BasePermission):
@@ -25,23 +35,34 @@ class IsOwnerOrReadOnly(BasePermission):
 def create_comment(request, post_id):
     post= get_object_or_404(Post, pk=post_id)
     serializer = CommentSerializer(data=request.data)
+
     if serializer.is_valid():
         serializer.save(user=request.user, post=post)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['POST'])
-def create_api_key(request):
-    username = request.data.get('username')
-    password = request.data.get('password')
+@api_view(['GET', 'POST'])
+def create_api_key_form(request):
+    if request.method == 'POST':
+        username = request.data.get('username')
+        password = request.data.get('password')
+        
+        if not username or not password:
+            return render(request, 'create_api_key.html', {'error': 'Username and password are required'})
 
-    user = authenticate(username=username, password=password)
-    if user is not None:
-        api_key, created = APIKey.objects.get_or_create(user=user)
-        return Response({'api_key': str(api_key.key)}, status=status.HTTP_201_CREATED)
-    
-    return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            api_key, created = APIKey.objects.get_or_create(user=user)
+            return render(request, 'create_api_key.html', {'api_key': str(api_key.key)})
+        else:
+            return render(request, 'create_api_key.html', {'error': 'Invalid credentials'})
+    return render(request, 'create_api_key.html')
+
+
+
 
 
 # DRF ViewSets

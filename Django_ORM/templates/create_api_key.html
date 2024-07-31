@@ -1,0 +1,26 @@
+<!-- templates/create_api_key.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create API Key</title>
+</head>
+<body>
+    <h1>Create API Key</h1>
+    <form method="post" action="{% url 'create_api_key_form' %}">
+        {% csrf_token %}
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <br>
+        <button type="submit">Create API Key</button>
+    </form>
+    {% if api_key %}
+        <p>Your API Key: {{ api_key }}</p>
+    {% elif error %}
+        <p>{{ error }}</p>
+    {% endif %}
+</body>
+</html>
