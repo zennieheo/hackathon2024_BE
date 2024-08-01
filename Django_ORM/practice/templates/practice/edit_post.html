@@ -23,7 +23,11 @@
                 <fieldset>
                     <legend>Upload New Images</legend>
                     <div class="form-group">
-                        <input type="file" name="images" multiple class="form-control-file">
+                        {{ image_formset.management_form }}
+                        {% for form in image_formset %}
+                            {{ form.as_p }}
+                        {% endfor %}
+                        <!-- <input type="file" name="images" multiple class="form-control-file"> -->
                     </div>
                 </fieldset>
                 
@@ -58,4 +62,5 @@
         <!-- 내비게이션 버튼 -->
         <a href="{% url 'board_detail' board.id %}" class="btn btn-primary">Back to Board</a>
     </div>
+
 {% endblock %}

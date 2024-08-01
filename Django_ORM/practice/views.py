@@ -13,7 +13,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 
 from .models import Board, Post, Comment, Image, APIKey
-from .forms import PostForm, CommentForm, ImageForm
+from .forms import PostForm, CommentForm, ImageForm  
 from .serializers import BoardSerializer, PostSerializer, CommentSerializer, ImageSerializer
 
 
@@ -173,25 +173,38 @@ def post_detail(request, board_id, post_id):
         })
 
 
+
+
+
 @login_required
 def new_post(request, board_id):
     board = get_object_or_404(Board, pk=board_id)
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
     if request.method == "POST":
         form = PostForm(request.POST, request.FILES)
-        image_form = ImageForm(request.POST, request.FILES, queryset=Image.objects.none())
+        image_form = ImageForm(request.POST, request.FILES, instance=board )  # queryset=Image.objects.none()
         if form.is_valid() and image_form.is_valid():
             post = form.save(commit=False)
             post.board = board
             post.user = request.user
             post.save()
 
+            image_form.instance = post
+            image_form.save()
+
+            """
             files = request.FILES.getlist('images')
             for file in files:
                 Image.objects.create(post=post, image=file)
 
+            """
+            
             return redirect('post_detail', board_id=board_id, post_id=post.id)
     else:
         form = PostForm()
+        image_form = ImageForm(instance=board)
 
     return render(request, 'practice/new_post.html', {'form': form, 'board': board})
 
@@ -200,6 +213,9 @@ def new_post(request, board_id):
 def edit_post(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     board = post.board
+
+    if not request.user.is_authenticated:
+        return redirect('login')
 
     if post.user != request.user:
         return redirect('post_detail', board_id=post.board.id, post_id=post.id)
@@ -235,3 +251,4 @@ def delete_post(request, post_id):
     board_id = post.board_id
     post.delete()
     return redirect('board_detail', board_id=board_id)
+
