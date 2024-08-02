@@ -4,15 +4,13 @@
 
 {% block content %}
     <div class="post-container">
-        <!-- 상단 구분선 -->
         <hr style="border: 2px solid black;">
 
-        <!-- 게시물 정보 -->
         <fieldset>
             <legend>Post</legend>
             <div class="post-header">
                 <h2>{{ post.title }}</h2>
-                <p>Written by: {{ post.writer }}</p>
+                <p>Written by: {{ post.user }}</p>
             </div>
 
             <div class="post-content">
@@ -22,14 +20,11 @@
             {% if post.images.all %}
                 <div class="post-images">
                     <h3>Images</h3>
-
-                    
-                        {% for image in post.images.all %}
-                            <div class="image-item">
-                                <img src="{{ image.image.url }}" alt="Post Image" class="img-fluid">
-                            </div>
-                        {% endfor %}
-                    
+                    {% for image in post.images.all %}
+                        <div class="image-item">
+                            <img src="{{ image.image.url }}" alt="Post Image" class="img-fluid">
+                        </div>
+                    {% endfor %}
                 </div>
             {% endif %}
 
@@ -41,13 +36,12 @@
 
         <br>
 
-        <!-- 댓글 섹션 -->
         <fieldset>
             <legend>Comments</legend>
             <div class="post-comments">
                 <ul>
                     {% for comment in comments %}
-                        <li><strong>{{ comment.writer }}</strong>: {{ comment.content }} ({{ comment.created_at }})</li>
+                        <li><strong>{{ comment.user }}</strong>: {{ comment.content }} ({{ comment.created_at }})</li>
                     {% endfor %}
                 </ul>
             </div>
@@ -55,7 +49,6 @@
 
         <br>
 
-        <!-- 댓글 추가 폼 -->
         <fieldset>
             <legend>Add a Comment</legend>
             <div class="add-comment">
@@ -69,17 +62,15 @@
 
         <br>
 
-        <!-- 내비게이션 버튼들 -->
-        <div class="post-navigation">
-            <a href="{% url 'board_detail' post.board.id %}" class="btn btn-primary">Back to Board</a>
-
-            <a href="{% url 'edit_post' post.id %}" class="btn btn-secondary">Edit Post</a>
-
-            <!-- 삭제 버튼 -->
-            <form action="{% url 'delete_post' post.id %}" method="post" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger">Delete Post</button>
-            </form>
-        </div>
+        {% if user.is_authenticated %}
+            <div class="post-navigation">
+                <a href="{% url 'board_detail' post.board.id %}" class="btn btn-primary">Back to Board</a>
+                <a href="{% url 'edit_post' post.id %}" class="btn btn-secondary">Edit Post</a>
+                <form action="{% url 'delete_post' post.id %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete Post</button>
+                </form>
+            </div>
+        {% endif %}
     </div>
 {% endblock %}
