@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Board, Post, Comment, Image
+from .models import Board, Post, Comment, Image, APIKey
 
 class BoardSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,3 +20,9 @@ class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
         fields = '__all__'
+
+
+class APIKeySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = APIKey
+        fields = ['key']

@@ -8,13 +8,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny, BasePermission
-from rest_framework import generics
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
 from .models import Board, Post, Comment, Image, APIKey
 from .forms import PostForm, CommentForm, ImageForm  
-from .serializers import BoardSerializer, PostSerializer, CommentSerializer, ImageSerializer
+from .serializers import BoardSerializer, PostSerializer, CommentSerializer, ImageSerializer, APIKeySerializer
 
 
 class ProtectedView(APIView):
@@ -44,22 +43,21 @@ def create_comment(request, post_id):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET', 'POST'])
+@api_view(['POST'])
 def create_api_key_form(request):
-    if request.method == 'POST':
-        username = request.data.get('username')
-        password = request.data.get('password')
-        
-        if not username or not password:
-            return render(request, 'create_api_key.html', {'error': 'Username and password are required'})
+    username = request.data.get('username')
+    password = request.data.get('password')
+    
+    if not username or not password:
+        return Response({'error': 'Username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        user = authenticate(username=username, password=password)
-        if user is not None:
-            api_key, created = APIKey.objects.get_or_create(user=user)
-            return render(request, 'create_api_key.html', {'api_key': str(api_key.key)})
-        else:
-            return render(request, 'create_api_key.html', {'error': 'Invalid credentials'})
-    return render(request, 'create_api_key.html')
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        api_key, created = APIKey.objects.get_or_create(user=user)
+        serializer = APIKeySerializer(api_key)
+        return Response({'api_key': serializer.data['key']}, status=status.HTTP_200_OK)
+    else:
+        return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 

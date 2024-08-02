@@ -72,13 +72,12 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
-"""
-'DEFAULT_SCHEMA_CLASS' : 'drf_spectacular.openapi.AutoSchema',
-'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'practice.authentication.APIKeyAuthentication',
-    ),
-"""
+SPECTACULAR_SETTINGS = {
+    'TITLE' : 'Backend : Board API ',
+    'DESCRIPTION': 'Likelion Hackathon 2024',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA' : False,
+}
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # 액세스 토큰의 유효 기간
@@ -105,6 +104,7 @@ MIDDLEWARE = [
 AUHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
+
 
 ROOT_URLCONF = 'Django_ORM.urls'
 
