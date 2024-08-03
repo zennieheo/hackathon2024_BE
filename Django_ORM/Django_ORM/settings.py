@@ -2,20 +2,19 @@ from datetime import timedelta
 from django.core.exceptions import ImproperlyConfigured
 import os
 from dotenv import load_dotenv
-
 load_dotenv()
 
 def get_env_variable(var_name):
     try:
         return os.environ[var_name]
-    except KeyError:
-        error_msg = 'Set the {} environment variable'.format(var_name)
-        raise ImproperlyConfigured(error_msg)
+    except KeyError: 
+        error_msg = "Set the {} environment variable" .format(var_name) # f-string 대신 .format()으로 변경하여 사용
+        raise ImproperlyConfigured (error_msg)
+
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = get_env_variable('SECRET_KEY')
-DATABASE_PASSWORD = get_env_variable('DB_PASSWORD')
 
+SIGNING_KEY = get_env_variable('SIGNING_KEY')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 # BASE_DIR = Path(__file__).resolve().parent.parent
@@ -84,12 +83,12 @@ SPECTACULAR_SETTINGS = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # 액세스 토큰의 유효 기간
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # 리프레시 토큰의 유효 기간
-    'ROTATE_REFRESH_TOKENS': True,                  # 리프레시 토큰 회전 여부
-    'BLACKLIST_AFTER_ROTATION': True,               # 회전된 리프레시 토큰 블랙리스트 여부
-    'ALGORITHM': 'HS256',                           # JWT 암호화 알고리즘
-    'SIGNING_KEY': get_env_variable('SIGNING_KEY'),                      # JWT 서명 키 (보안을 위해 강력한 비밀키를 사용하세요)
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),   
+    'ROTATE_REFRESH_TOKENS': True,                  
+    'BLACKLIST_AFTER_ROTATION': True,               
+    'ALGORITHM': 'HS256',                          
+    'SIGNING_KEY': get_env_variable('SIGNING_KEY'),                      
     'VERIFYING_KEY': None,
     'AUTH_HEADER_TYPES': ('Bearer',),
 }

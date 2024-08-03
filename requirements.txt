@@ -10,9 +10,13 @@ gunicorn==22.0.0
 inflection==0.5.1
 jsonschema==4.23.0
 jsonschema-specifications==2023.12.1
+mysql-connector-python==9.0.0
+mysqlclient==2.2.4
 packaging==24.1
 pillow==10.4.0
 PyJWT==2.8.0
+python-decouple==3.8
+python-dotenv==1.0.1
 PyYAML==6.0.1
 referencing==0.35.1
 rpds-py==0.19.1
