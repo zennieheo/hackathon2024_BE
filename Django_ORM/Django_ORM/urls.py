@@ -3,6 +3,8 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.static import serve
+from django.urls import re_path
 
 from drf_spectacular.views import SpectacularAPIView, SpectacularJSONAPIView, SpectacularSwaggerView, SpectacularRedocView
 
@@ -20,7 +22,9 @@ urlpatterns = [
     path('schema/', SpectacularAPIView.as_view(), name='schema'),  # API 스키마의 기본 URL
     path('schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),  # Swagger UI를 통해 API 문서를 시각화하는 URL
     path('schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),  # ReDoc을 통해 API 문서를 시각화하는 URL
+
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root':settings.MEDIA_ROOT}),
+    re_path(r'^static/(?:.*)$', serve, {'document_root': settings.STATIC_ROOT, }),
+
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

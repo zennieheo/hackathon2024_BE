@@ -1,8 +1,8 @@
 from datetime import timedelta
 from django.core.exceptions import ImproperlyConfigured
 import os
-
 from dotenv import load_dotenv
+
 load_dotenv()
 
 # 추가 
@@ -34,7 +34,6 @@ DATABASES = {
 # SECURITY WARNING: keep the secret key used in production secret!
 
 
-SECRET_KEY = os.environ.get('SECRET_KEY', 'default-secret-key')
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -182,19 +181,6 @@ WSGI_APPLICATION = 'Django_ORM.wsgi.application'
 
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('DATABASE'),
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': os.environ.get('DB_HOST', 'localhost'),
-        'PORT': os.environ.get('DB_PORT', '3306'),
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-        }
-    }
-}
 
 
 # Password validation
