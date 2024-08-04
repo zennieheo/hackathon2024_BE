@@ -3,32 +3,29 @@ from django.core.exceptions import ImproperlyConfigured
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
 
-# 추가 
-def get_env_variable(var_name):
-  try:
-    return os.environ[var_name]
-  except KeyError:
-    error_msg = 'Set the {} environment variable'.format(var_name)
-    raise ImproperlyConfigured(error_msg)
+# !!!!!!!!!!!!!!!!!! 데이터 베이스 설정 관련 코드
 
-SECRET_KEY = get_env_variable('DJANGO_SECRET')
-
-# 데이터베이스는 AWS RDS Mysql 사용 했습니다.
+# secret_key와 database설정을 하드콛ㅇ된 값으로 직접 설정
+SECRET_KEY = '5xeuu%71e@wu=#f@^xs6fp0d$adc@c7dvk@8-gfb%0r@ynpe*-'
+# 데이터베이스 설정 (하드코딩된 값 사용)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-		'NAME': get_env_variable('DATABASE'),
-        'USER': get_env_variable('DB_USER'),
-        'PASSWORD': get_env_variable('DB_PASSWORD'),
-        'HOST': get_env_variable('DB_HOST'),
-        'PORT': get_env_variable('DB_PORT'),
-        'OPTIONS':{
-            'init_command' : "SET sql_mode='STRICT_TRANS_TABLES'"
+        'NAME': 'mydatabase',
+        'USER': 'root',
+        'PASSWORD': '1101',
+        'HOST': '<All Hosts (%)>',
+        'PORT': '3306',
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
         }
     }
 }
+
+# 여기까지가 데이터 베이스 관련 설정
+
+
 
 
 # SECURITY WARNING: keep the secret key used in production secret!

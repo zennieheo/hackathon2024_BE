@@ -201,4 +201,3 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,python
 
-.env  #.gitignore에 반드시 추가할것!
