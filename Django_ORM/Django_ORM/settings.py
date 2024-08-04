@@ -1,20 +1,41 @@
 from datetime import timedelta
 from django.core.exceptions import ImproperlyConfigured
 import os
+
 from dotenv import load_dotenv
 load_dotenv()
 
+# 추가 
 def get_env_variable(var_name):
-    try:
-        return os.environ[var_name]
-    except KeyError: 
-        error_msg = "Set the {} environment variable" .format(var_name)
-        raise ImproperlyConfigured (error_msg)
+  try:
+    return os.environ[var_name]
+  except KeyError:
+    error_msg = 'Set the {} environment variable'.format(var_name)
+    raise ImproperlyConfigured(error_msg)
+
+SECRET_KEY = get_env_variable('DJANGO_SECRET')
+
+# 데이터베이스는 AWS RDS Mysql 사용 했습니다.
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+		'NAME': get_env_variable('DATABASE'),
+        'USER': get_env_variable('DB_USER'),
+        'PASSWORD': get_env_variable('DB_PASSWORD'),
+        'HOST': get_env_variable('DB_HOST'),
+        'PORT': get_env_variable('DB_PORT'),
+        'OPTIONS':{
+            'init_command' : "SET sql_mode='STRICT_TRANS_TABLES'"
+        }
+    }
+}
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-SECRET_KEY = get_env_variable('SECRET_KEY')
+
+SECRET_KEY = os.environ.get('SECRET_KEY', 'default-secret-key')
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 # BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,7 +49,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True  # 개발중에는 True로 설정, 실제 배포 환경에서는 False로 설정
+DEBUG = False  # 개발중에는 True로 설정, 실제 배포 환경에서는 False로 설정
 
 ALLOWED_HOSTS = ["*"]
 
@@ -115,20 +136,7 @@ SIMPLE_JWT = {
 
 
 
-"""
-SIMPLE_JWT = {
-    
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),   
-    'ROTATE_REFRESH_TOKENS': False,    #수정 t -> f              
-    'BLACKLIST_AFTER_ROTATION': True,   
 
-    'ALGORITHM': 'HS256',                          
-    'SIGNING_KEY': get_env_variable('SECRET_KEY'),                      
-    'VERIFYING_KEY': None,
-    'AUTH_HEADER_TYPES': ('Bearer',),
-}
-"""
 
 
 MIDDLEWARE = [
@@ -175,15 +183,16 @@ WSGI_APPLICATION = 'Django_ORM.wsgi.application'
 
 
 DATABASES = {
-    'default' : {
-        'ENGINE' : 'django.db.backends.mysql',
-        'NAME' : get_env_variable('DATABASE'),
-        'USER' : get_env_variable('DB_USER'),
-        'PASSWORD': get_env_variable('DB_PASSWORD'),
-        'HOST': get_env_variable('DB_HOST'),
-        'PORT': get_env_variable('DB_PORT'),
-        'OPTIONS':{
-            'init_command' : "SET sql_mode='STRICT_TRANS_TABLES'"}
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('DATABASE'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '3306'),
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+        }
     }
 }
 
@@ -236,8 +245,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
-# MEDIA_ROOT = BASE_DIR / 'media'
-
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
@@ -246,12 +253,6 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
 
-# 또는 특정 도메인만 허용
-CORS_ALLOWED_ORIGINS = [
-    "https://example.com",
-    "https://sub.example.com",
-    "http://localhost:8000",
-]
 
 
 
