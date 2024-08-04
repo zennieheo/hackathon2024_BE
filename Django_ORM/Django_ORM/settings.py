@@ -1,25 +1,39 @@
 from datetime import timedelta
+from pathlib import Path
 from django.core.exceptions import ImproperlyConfigured
 import os
 from dotenv import load_dotenv
 
+load_dotenv()
 
-# !!!!!!!!!!!!!!!!!! 데이터 베이스 설정 관련 코드
 
-# secret_key와 database설정을 하드콛ㅇ된 값으로 직접 설정
-SECRET_KEY = '5xeuu%71e@wu=#f@^xs6fp0d$adc@c7dvk@8-gfb%0r@ynpe*-'
-# 데이터베이스 설정 (하드코딩된 값 사용)
+SECRET_KEY = os.getenv('SECRET_KEY') # 수정
+
+
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mydatabase',
-        'USER': 'root',
+        'NAME': 'zennieheo', #database_name
+        'USER': 'zennie', #database_user
         'PASSWORD': '1101',
-        'HOST': '<All Hosts (%)>',
+        'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
         }
+    }
+}
+"""
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.getenv('DATABASE_NAME'),
+        'USER': os.getenv('DATABASE_USER'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD'),
+        'HOST': os.getenv('DATABASE_HOST'),
+        'PORT': os.getenv('DATABASE_PORT'),
     }
 }
 
@@ -34,8 +48,8 @@ DATABASES = {
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-# BASE_DIR = Path(__file__).resolve().parent.parent
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = Path(__file__).resolve().parent.parent
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -45,7 +59,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False  # 개발중에는 True로 설정, 실제 배포 환경에서는 False로 설정
+DEBUG = True  # 개발중에는 True로 설정, 실제 배포 환경에서는 False로 설정
 
 ALLOWED_HOSTS = ["*"]
 
