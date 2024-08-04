@@ -8,23 +8,10 @@ load_dotenv()
 
 
 SECRET_KEY = os.getenv('SECRET_KEY') # 수정
+# SECRET_KEY = 'django-insecure-!&_n(d^mls0lwvwb2t0orgy&#!wm_68=zgyc0_n%n@j+dp3@o*'
 
 
-"""
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'zennieheo', #database_name
-        'USER': 'zennie', #database_user
-        'PASSWORD': '1101',
-        'HOST': 'localhost',
-        'PORT': '3306',
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-        }
-    }
-}
-"""
+
 
 DATABASES = {
     'default': {
@@ -36,6 +23,18 @@ DATABASES = {
         'PORT': os.getenv('DATABASE_PORT'),
     }
 }
+
+
+"""
+서연언니
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+"""
 
 # 여기까지가 데이터 베이스 관련 설정
 
@@ -77,6 +76,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'practice',
     'corsheaders',
+    'rest_framework.authtoken', 
 ]
 
 # REST Framework settings
@@ -246,6 +246,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 
+CSRF_TRUSTED_ORIGINS = ['http://localhost:8000']
+CSRF_COOKIE_SECURE = False
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
@@ -274,4 +276,6 @@ CORS_ALLOW_METHODS = [
 ]
 
 
+
+AUTH_USER_MODEL = 'practice.CustomUser' #ayyyyyyyyyyyyyyyyyyyy
 

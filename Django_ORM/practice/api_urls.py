@@ -25,7 +25,7 @@ urlpatterns = [
     path('', include(router.urls)),
 
     # JWT 인증 관련 URL
-    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    # path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    # path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('protected/', ProtectedView.as_view(), name='protected_view'),
 ]
