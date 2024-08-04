@@ -8,13 +8,13 @@ def get_env_variable(var_name):
     try:
         return os.environ[var_name]
     except KeyError: 
-        error_msg = "Set the {} environment variable" .format(var_name) # f-string 대신 .format()으로 변경하여 사용
+        error_msg = "Set the {} environment variable" .format(var_name)
         raise ImproperlyConfigured (error_msg)
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-SIGNING_KEY = get_env_variable('SIGNING_KEY')
+SECRET_KEY = get_env_variable('SECRET_KEY')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 # BASE_DIR = Path(__file__).resolve().parent.parent
@@ -82,16 +82,54 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA' : False,
 }
 
+
 SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': False,
+
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,  # Use the fetched SECRET_KEY here
+    'VERIFYING_KEY': None,
+    'AUDIENCE': None,
+    'ISSUER': None,
+
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
+
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+
+    'JTI_CLAIM': 'jti',
+
+    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+}
+
+
+
+
+"""
+SIMPLE_JWT = {
+    
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),   
-    'ROTATE_REFRESH_TOKENS': True,                  
-    'BLACKLIST_AFTER_ROTATION': True,               
+    'ROTATE_REFRESH_TOKENS': False,    #수정 t -> f              
+    'BLACKLIST_AFTER_ROTATION': True,   
+
     'ALGORITHM': 'HS256',                          
-    'SIGNING_KEY': get_env_variable('SIGNING_KEY'),                      
+    'SIGNING_KEY': get_env_variable('SECRET_KEY'),                      
     'VERIFYING_KEY': None,
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
+"""
+
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -179,12 +217,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-"""
-STATIC_DIRS = [os.path.join(BASE_DIR, 'static')]
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-"""
 
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
