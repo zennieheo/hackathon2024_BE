@@ -7,7 +7,6 @@ from django.http import JsonResponse # added
 import uuid
 
 from .models import Board, Post, Comment, Image, APIKey, CustomUser, FoodIntake
-from .forms import PostForm, CommentForm, ImageForm  
 from .serializers import BoardSerializer, PostSerializer, CommentSerializer, ImageSerializer, APIKeySerializer, UserSerializer, FoodIntakeSerializer
 
 

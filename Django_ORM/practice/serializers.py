@@ -31,11 +31,6 @@ class APIKeySerializer(serializers.ModelSerializer):
 
 
 
-
-
-
-# ayyyyyyyyyyyy
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
@@ -59,6 +54,8 @@ class UserSerializer(serializers.ModelSerializer):
         
         user.save()
         return user
+    
+    
 class FoodIntakeSerializer(serializers.ModelSerializer):
     class Meta:
         model = FoodIntake
