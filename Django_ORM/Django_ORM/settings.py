@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'rest_framework',
     'drf_spectacular',
-    'rest_framework_simplejwt',
     'practice',
     'corsheaders',
 ]
@@ -66,30 +65,16 @@ REST_FRAMEWORK = {
     },
 
     'DEFAULT_AUTHENTICATION_CLASSES' : (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ),
 
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
-"""
-'DEFAULT_SCHEMA_CLASS' : 'drf_spectacular.openapi.AutoSchema',
-'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'practice.authentication.APIKeyAuthentication',
-    ),
-"""
 
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # 액세스 토큰의 유효 기간
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # 리프레시 토큰의 유효 기간
-    'ROTATE_REFRESH_TOKENS': True,                  # 리프레시 토큰 회전 여부
-    'BLACKLIST_AFTER_ROTATION': True,               # 회전된 리프레시 토큰 블랙리스트 여부
-    'ALGORITHM': 'HS256',                           # JWT 암호화 알고리즘
-    'SIGNING_KEY': 'HACKATHON',                      # JWT 서명 키 (보안을 위해 강력한 비밀키를 사용하세요)
-    'VERIFYING_KEY': None,
-    'AUTH_HEADER_TYPES': ('Bearer',),
-}
+
+
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',

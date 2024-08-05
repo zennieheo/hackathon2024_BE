@@ -1,27 +1,12 @@
-from django.urls import path
-from . import views
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import BoardViewSet, PostViewSet, CommentViewSet
+
+router = DefaultRouter()
+router.register(r'boards', BoardViewSet)
+router.register(r'posts', PostViewSet)
+router.register(r'comments', CommentViewSet)
 
 urlpatterns = [
-    path('', views.index, name='index'),
-    
-    path('board/<int:board_id>/', 
-         views.board_detail, 
-         name='board_detail'),
-    
-    path('board/<int:board_id>/post/<int:post_id>/', 
-         views.post_detail, 
-         name='post_detail'),
-    
-    path('board/<int:board_id>/new_post/', 
-         views.new_post, 
-         name='new_post'),
-    
-    path('post/<int:post_id>/edit/', 
-         views.edit_post, 
-         name='edit_post'),
-    
-    path('post/<int:post_id>/delete/', 
-         views.delete_post, 
-         name='delete_post'),
-
+    path('', include(router.urls)),
 ]
