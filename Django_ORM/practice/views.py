@@ -1,14 +1,15 @@
-from django.shortcuts import render, get_object_or_404, redirect
+import re
+from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import User #customuser?
+from django.http import JsonResponse # added
 import uuid
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from .models import Board, Post, Comment, Image, APIKey, CustomUser, FoodIntake
 from .forms import PostForm, CommentForm, ImageForm  
 from .serializers import BoardSerializer, PostSerializer, CommentSerializer, ImageSerializer, APIKeySerializer, UserSerializer, FoodIntakeSerializer
 
-#ayyyyyyyyy
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Sum
@@ -25,19 +26,26 @@ from rest_framework.authtoken.models import Token
 
 
 
-class ProtectedView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        return Response({'message': 'This is a protected view!'})
-
-# Custom permission class
 class IsOwnerOrReadOnly(BasePermission):
+    # permssion class to allow object owner to edit, and others to read.
     def has_object_permission(self, request, view, obj):
         if request.method in ('GET', 'HEAD', 'OPTIONS'):
             return True
         return obj.user == request.user
 
+def root_view(request): #http://127.0.0.1:8000/ 에 뜨는 첫 화면 세팅인데 지워도 됨....
+    return JsonResponse({"message": "Welcome to the API!"})
+
+"""
+class ProtectedView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return Response({'message': 'This is a protected view!'})
+    
+"""
+
+# apiview를 사용한 댓글 생성 api
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_comment(request, post_id):
@@ -51,43 +59,59 @@ def create_comment(request, post_id):
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+# apiview를 사용한 api 키 생성/획득 api ____필요한가??
 @api_view(['POST'])
 def create_api_key_form(request):
     username = request.data.get('username')
     password = request.data.get('password')
     
     if not username or not password:
-        return Response({'error': 'Username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {'error': 'Username and password are required'},
+            status=status.HTTP_400_BAD_REQUEST,
+            )
 
     user = authenticate(username=username, password=password)
     if user is not None:
         api_key, created = APIKey.objects.get_or_create(user=user)
         serializer = APIKeySerializer(api_key)
-        return Response({'api_key': serializer.data['key']}, status=status.HTTP_200_OK)
+        return Response(
+            {'api_key': serializer.data['key']},
+            status=status.HTTP_200_OK,
+            )
     else:
-        return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(
+            {'error': 'Invalid credentials'},
+            status=status.HTTP_401_UNAUTHORIZED,
+            )
 
 
 
 
 
-# DRF ViewSets
+# 보드 리스트 및 세부 정보 api
 class BoardViewSet(viewsets.ModelViewSet):
     queryset = Board.objects.all()
     serializer_class = BoardSerializer
     permission_classes = [AllowAny]
 
-
+# 게시글 리스트, 세부정보, 생성, 수정, 삭제 api
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
-    def perform_create(self, serializer):
+    def get_queryset(self): # 특정 게시판의 게시글만 가져오기
+        
+        board_id = self.request.query_params.get('board_id')
+        if board_id:
+            return self.queryset.filter(board_id=board_id)
+        return self.queryset
+    
+    def perform_create(self, serializer): # 게시글 생성 시 사용자 지정
         serializer.save(user=self.request.user)
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs): # 게시글 및 이미지 생성
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         post = serializer.save(user=request.user)
@@ -99,7 +123,7 @@ class PostViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-    def update(self, request, *args, **kwargs):
+    def update(self, request, *args, **kwargs): # 게시글 및 이미지 수정
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
@@ -119,7 +143,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
-
+# 댓글 리스트, 생성, 수정, 삭제 api
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
@@ -128,136 +152,42 @@ class CommentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-
+# 이미지 리스트, 생성, 수정, 삭제 api
 class ImageViewSet(viewsets.ModelViewSet):
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
 
-# Django Template Views
-def index(request):
-    boards = Board.objects.all()
-    return render(request, 'practice/index.html', {'boards': boards})
+# apiview를 사용한 특정 게시글 및 댓글 조회 api
+class PostDetailAPIView(APIView):
+    permission_classes = [AllowAny]  
 
+    def get(self, request, board_id, post_id):
 
-def board_detail(request, board_id):
-    board = get_object_or_404(Board, pk=board_id)
-    posts = board.post_set.all()
+        post = get_object_or_404(Post, pk=post_id)
+        post_serializer = PostSerializer(post)
 
-    page = request.GET.get('page', 1)
-    paginator = Paginator(posts, 10)
+        comments = post.comments.all()
+        comment_serializer = CommentSerializer(comments, many=True)
 
-    try:
-        posts = paginator.page(page)
-    except PageNotAnInteger:
-        posts = paginator.page(1)
-    except EmptyPage:
-        posts = paginator.page(paginator.num_pages)
-
-    return render(request, 'practice/board_detail.html', {'board': board, 'posts': posts})
-
-
-def post_detail(request, board_id, post_id):
-    post = get_object_or_404(Post, pk=post_id)
-    comments = post.comments.all()
-
-    if request.method == "POST":
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            comment = form.save(commit=False)
-            comment.post = post
-            comment.user = request.user
-            comment.save()
-            return redirect('post_detail', board_id=board_id, post_id=post_id)
-    else:
-        form = CommentForm()
-
-    return render(request, 'practice/post_detail.html', {
-        'post': post,
-        'comments': comments,
-        'form': form,
-        })
+        # JSON 형태로 Post 및 관련 Comment 반환
+        return Response(
+            {
+                "post": post_serializer.data,
+                "comments": comment_serializer.data,
+            },
+        )
+           
 
 
 
 
 
-@login_required
-def new_post(request, board_id):
-    board = get_object_or_404(Board, pk=board_id)
-    if not request.user.is_authenticated:
-        return redirect('login')
-    
-    if request.method == "POST":
-        form = PostForm(request.POST, request.FILES)
-        image_form = ImageForm(request.POST, request.FILES, instance=board )  # queryset=Image.objects.none()
-        if form.is_valid() and image_form.is_valid():
-            post = form.save(commit=False)
-            post.board = board
-            post.user = request.user
-            post.save()
-
-            image_form.instance = post
-            image_form.save()
-
-            """
-            files = request.FILES.getlist('images')
-            for file in files:
-                Image.objects.create(post=post, image=file)
-
-            """
-            
-            return redirect('post_detail', board_id=board_id, post_id=post.id)
-    else:
-        form = PostForm()
-        image_form = ImageForm(instance=board)
-
-    return render(request, 'practice/new_post.html', {'form': form, 'board': board})
 
 
-@login_required
-def edit_post(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
-    board = post.board
-
-    if not request.user.is_authenticated:
-        return redirect('login')
-
-    if post.user != request.user:
-        return redirect('post_detail', board_id=post.board.id, post_id=post.id)
-
-    if request.method == "POST":
-        post_form = PostForm(request.POST, instance=post)
-        if post_form.is_valid():
-            post = post_form.save()
-
-            files = request.FILES.getlist('images')
-            for file in files:
-                Image.objects.create(post=post, image=file)
-
-            image_ids_to_delete = request.POST.getlist('delete_images')
-            for image_id in image_ids_to_delete:
-                Image.objects.filter(id=image_id).delete()
-
-            return redirect('post_detail', board_id=post.board_id, post_id=post.id)
-    else:
-        post_form = PostForm(instance=post)
-
-    images = post.images.all()
-    return render(request, 'practice/edit_post.html', {'post_form': post_form, 'images': images, 'board': board})
 
 
-@login_required
-def delete_post(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
-
-    if post.user != request.user:
-        return redirect('post_detail', board_id=post.board.id, post_id=post.id)
-
-    board_id = post.board_id
-    post.delete()
-    return redirect('board_detail', board_id=board_id)
 
 
 
@@ -339,82 +269,21 @@ def update_required_intake(request):
 
 
 
-# foodintake_views.py
-class FoodIntakeView(APIView):
+
+
+class FoodIntakeViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
-    def put(self, request):
-        serializer = FoodIntakeSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(user=request.user)
-            
-            # 날짜를 기준으로 누적된 섭취량 계산
-            date = request.data.get('date')
+    def format_decimal(self, value):
+        """Decimal 값을 소수점 두 자리까지 포맷팅"""
+        if value is None:
+            return '0.00'
+        return str(Decimal(value).quantize(Decimal('0.00'), rounding=ROUND_HALF_UP))
 
-            # 식사 종류별로 영양섭취량 누적 계산
-            meal_totals = FoodIntake.objects.filter(
-                user=request.user,
-                date=date
-            ).values('meal_time').annotate(
-                total_calories=Sum('calories'),
-                total_carbs=Sum('carbs'),
-                total_protein=Sum('protein'),
-                total_fat=Sum('fat')
-            )
-
-            # 하루 총 섭취량 계산
-            daily_totals = FoodIntake.objects.filter(
-                user=request.user,
-                date=date
-            ).aggregate(
-                total_calories=Sum('calories'),
-                total_carbs=Sum('carbs'),
-                total_protein=Sum('protein'),
-                total_fat=Sum('fat')
-            )
-
-            # 소수점 두 자리까지 포맷팅
-            def format_decimal(value):
-                """Decimal 값을 소수점 두 자리까지 포맷팅"""
-                if value is None:
-                    return '0.00'
-                return str(Decimal(value).quantize(Decimal('0.00'), rounding=ROUND_HALF_UP))
-
-            # 응답 형식 맞추기
-            meal_totals_dict = {
-                meal['meal_time']: {
-                    'total_calories': format_decimal(meal['total_calories']),
-                    'total_carbs': format_decimal(meal['total_carbs']),
-                    'total_protein': format_decimal(meal['total_protein']),
-                    'total_fat': format_decimal(meal['total_fat'])
-                } for meal in meal_totals
-            }
-
-            # 하루 총 섭취량 추가
-            meal_totals_dict['daily'] = {
-                'total_calories': format_decimal(daily_totals['total_calories']),
-                'total_carbs': format_decimal(daily_totals['total_carbs']),
-                'total_protein': format_decimal(daily_totals['total_protein']),
-                'total_fat': format_decimal(daily_totals['total_fat'])
-            }
-
-            # 날짜 추가
-            meal_totals_dict['date'] = date
-            
-            return Response(meal_totals_dict, status=status.HTTP_200_OK)
-        
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def get(self, request):
-        # 요청에서 날짜를 가져옵니다
-        date = request.query_params.get('date')
-
-        if not date:
-            return Response({"detail": "Date parameter is required."}, status=status.HTTP_400_BAD_REQUEST)
-
-        # 저장된 식단을 가져옵니다
+    def calculate_totals(self, user, date):
+        """날짜를 기준으로 섭취량 총계 계산"""
         meal_totals = FoodIntake.objects.filter(
-            user=request.user,
+            user=user,
             date=date
         ).values('meal_time').annotate(
             total_calories=Sum('calories'),
@@ -424,7 +293,7 @@ class FoodIntakeView(APIView):
         )
 
         daily_totals = FoodIntake.objects.filter(
-            user=request.user,
+            user=user,
             date=date
         ).aggregate(
             total_calories=Sum('calories'),
@@ -433,44 +302,54 @@ class FoodIntakeView(APIView):
             total_fat=Sum('fat')
         )
 
-        # 소수점 두 자리까지 포맷팅
-        def format_decimal(value):
-            
-            if value is None:
-                return '0.00'
-            return str(Decimal(value).quantize(Decimal('0.00'), rounding=ROUND_HALF_UP))
-
-        # 응답 형식 맞추기
         meal_totals_dict = {
             meal['meal_time']: {
-                'total_calories': format_decimal(meal['total_calories']),
-                'total_carbs': format_decimal(meal['total_carbs']),
-                'total_protein': format_decimal(meal['total_protein']),
-                'total_fat': format_decimal(meal['total_fat'])
+                'total_calories': self.format_decimal(meal['total_calories']),
+                'total_carbs': self.format_decimal(meal['total_carbs']),
+                'total_protein': self.format_decimal(meal['total_protein']),
+                'total_fat': self.format_decimal(meal['total_fat'])
             } for meal in meal_totals
         }
 
-        # 하루 총 섭취량 추가
         meal_totals_dict['daily'] = {
-            'total_calories': format_decimal(daily_totals['total_calories']),
-            'total_carbs': format_decimal(daily_totals['total_carbs']),
-            'total_protein': format_decimal(daily_totals['total_protein']),
-            'total_fat': format_decimal(daily_totals['total_fat'])
+            'total_calories': self.format_decimal(daily_totals['total_calories']),
+            'total_carbs': self.format_decimal(daily_totals['total_carbs']),
+            'total_protein': self.format_decimal(daily_totals['total_protein']),
+            'total_fat': self.format_decimal(daily_totals['total_fat'])
         }
 
-        # 날짜 추가
         meal_totals_dict['date'] = date
 
+        return meal_totals_dict
+
+    def create(self, request):
+        serializer = FoodIntakeSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            date = request.data.get('date')
+            if not date:
+                return Response({"detail": "Date is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+            meal_totals_dict = self.calculate_totals(request.user, date)
+            return Response(meal_totals_dict, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def list(self, request):
+        date = request.query_params.get('date')
+        if not date:
+            return Response({"detail": "Date parameter is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not re.match(r'\d{4}-\d{2}-\d{2}', date):
+            return Response({"detail": "Invalid date format. Use YYYY-MM-DD."}, status=status.HTTP_400_BAD_REQUEST)
+
+        meal_totals_dict = self.calculate_totals(request.user, date)
         return Response(meal_totals_dict, status=status.HTTP_200_OK)
 
-    
-    def delete(self, request):
-        # 모든 저장된 식단 데이터를 삭제
+    def destroy(self, request):
         deleted_count, _ = FoodIntake.objects.filter(user=request.user).delete()
         
         if deleted_count > 0:
             return Response({'message': '모든 식단 데이터가 성공적으로 삭제되었습니다.'}, status=status.HTTP_204_NO_CONTENT)
         else:
             return Response({'error': '삭제할 데이터가 없습니다.'}, status=status.HTTP_404_NOT_FOUND)
-
-

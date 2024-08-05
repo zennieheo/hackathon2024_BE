@@ -25,17 +25,7 @@ DATABASES = {
 
 
 
-
-# 여기까지가 데이터 베이스 관련 설정
-
-
-
-
 # SECURITY WARNING: keep the secret key used in production secret!
-
-
-
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -133,11 +123,6 @@ SIMPLE_JWT = {
 }
 
 
-
-
-
-
-
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -218,11 +203,6 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-
-
-
-
 
 
 

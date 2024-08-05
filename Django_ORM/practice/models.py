@@ -21,8 +21,6 @@ class CustomUser(AbstractUser):
     required_intake = models.FloatField(null=True, blank=True)  # 권장 섭취량
 
 
-
-   
     def __str__(self):
         return self.username
 
@@ -78,11 +76,6 @@ class Image(models.Model):
 
 
 
-
-
-#ayyyyyyyyyyyyyyyyyyyyyyyyyyy
-
-
 class FoodIntake(models.Model):
       
         MEAL_TIMES = [
@@ -98,7 +91,7 @@ class FoodIntake(models.Model):
         protein = models.FloatField()
         meal_time = models.CharField(max_length=10, choices=MEAL_TIMES) 
         fat = models.FloatField()
-        date = models.DateField(auto_now_add=True)
+        date = models.DateField(auto_now_add=True) 
 
         def __str__(self):
           return f"{self.food_name} by {self.user.username} on {self.date}"
