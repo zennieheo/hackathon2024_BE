@@ -58,7 +58,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken', 
 ]
 
-# REST Framework settings
+# REST Framework settings``
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
