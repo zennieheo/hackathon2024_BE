@@ -7,7 +7,7 @@ from django.http import JsonResponse # added
 import uuid
 
 from .models import Board, Post, Comment, Image, APIKey, CustomUser, FoodIntake
-from .serializers import BoardSerializer, PostSerializer, CommentSerializer, ImageSerializer, APIKeySerializer, UserSerializer, FoodIntakeSerializer
+from .serializers import BoardSerializer, PostSerializer, CommentSerializer, ImageSerializer, APIKeySerializer, UserSerializer, FoodIntakeSerializer, RegisterSerializer
 
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -15,13 +15,14 @@ from django.db.models import Sum
 
 from decimal import Decimal, ROUND_HALF_UP
 
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, generics #added
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny, BasePermission
-from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.authtoken.models import Token
+
+
 
 
 
@@ -35,14 +36,7 @@ class IsOwnerOrReadOnly(BasePermission):
 def root_view(request): #http://127.0.0.1:8000/ 에 뜨는 첫 화면 세팅인데 지워도 됨....
     return JsonResponse({"message": "Welcome to the API!"})
 
-"""
-class ProtectedView(APIView):
-    permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        return Response({'message': 'This is a protected view!'})
-    
-"""
 
 # apiview를 사용한 댓글 생성 api
 @api_view(['POST'])
@@ -193,6 +187,18 @@ class PostDetailAPIView(APIView):
 # ayyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
 
 
+# Register API _________added!!!!!!!!
+class RegisterAPI(generics.GenericAPIView):
+    serializer_class = RegisterSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user=serializer.save()
+        return Response({
+            "user": UserSerializer(user, context=self.get_serializer_context()).data,
+            "token": Token.objects.create(user)[1],
+        })
 
 
 # accounts/views.py

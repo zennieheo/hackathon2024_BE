@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Board, Post, Comment, Image, APIKey, CustomUser, FoodIntake
+from .models import Board, Post, Comment, Image, APIKey, CustomUser, FoodIntake, CustomUser
 
 
 class BoardSerializer(serializers.ModelSerializer):
@@ -31,14 +31,11 @@ class APIKeySerializer(serializers.ModelSerializer):
 
 
 
-class UserSerializer(serializers.ModelSerializer):
+class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['name', 'email', 'activity_level', 'height', 'weight', 'username', 'password', 'required_intake']
-        extra_kwargs = {
-            'password': {'write_only': True},
-            
-        }
+        extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
         user = CustomUser(
@@ -48,14 +45,20 @@ class UserSerializer(serializers.ModelSerializer):
             activity_level=validated_data['activity_level'],
             height=validated_data['height'],
             weight=validated_data['weight'],
-            required_intake = validated_data['required_intake'],
+            required_intake=validated_data['required_intake'],
         )
         user.set_password(validated_data['password'])
-        
         user.save()
         return user
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['name', 'email', 'activity_level', 'height', 'weight', 'username', 'password', 'required_intake']
+        
     
-    
+
 class FoodIntakeSerializer(serializers.ModelSerializer):
     class Meta:
         model = FoodIntake

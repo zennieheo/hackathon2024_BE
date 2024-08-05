@@ -80,6 +80,9 @@ REST_FRAMEWORK = {
 
     'DEFAULT_AUTHENTICATION_CLASSES' : (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication', #added - 서연언니거에서 들고와봄
+        # 'rest_framework.authentiation.BasicAuthentication',
+        # 'rest_framemwork.authentication.SessionAuthentication', # 아저씨 유튜브에서 들고옴. 그 아저씨가 왜 주석처리 했는지는 모르겠음.
     ),
 
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
