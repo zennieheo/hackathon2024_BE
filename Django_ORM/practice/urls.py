@@ -9,4 +9,5 @@ router.register(r'comments', CommentViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('boards/<int:board_id>/posts/', PostViewSet.as_view({'get': 'list', 'post': 'create'}), name='board-posts'),
 ]
