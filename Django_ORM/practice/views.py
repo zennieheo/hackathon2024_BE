@@ -25,16 +25,6 @@ from rest_framework.authtoken.models import Token
 
 
 
-
-
-
-
-
-
-
-
-
-
 class ProtectedView(APIView):
     permission_classes = [IsAuthenticated]
 

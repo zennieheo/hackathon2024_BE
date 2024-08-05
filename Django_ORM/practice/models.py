@@ -2,7 +2,6 @@ from django.db import models
 from django.utils import timezone
 import uuid
 from django.contrib.auth.models import AbstractUser 
-# from django.contrib.auth.models import User
 
 
 
@@ -21,7 +20,6 @@ class CustomUser(AbstractUser):
     weight = models.FloatField(default=70.0)   # 기본값 설정
     required_intake = models.FloatField(null=True, blank=True)  # 권장 섭취량
 
-    # required_intake = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
 
    

@@ -1,14 +1,13 @@
 from datetime import timedelta
 from pathlib import Path
-from django.core.exceptions import ImproperlyConfigured
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-SECRET_KEY = os.getenv('SECRET_KEY') # 수정
-# SECRET_KEY = 'django-insecure-!&_n(d^mls0lwvwb2t0orgy&#!wm_68=zgyc0_n%n@j+dp3@o*'
+SECRET_KEY = os.getenv('SECRET_KEY') 
 
 
 
@@ -25,16 +24,7 @@ DATABASES = {
 }
 
 
-"""
-서연언니
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
 
-"""
 
 # 여기까지가 데이터 베이스 관련 설정
 
@@ -47,7 +37,6 @@ DATABASES = {
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
@@ -122,7 +111,7 @@ SIMPLE_JWT = {
     'UPDATE_LAST_LOGIN': False,
 
     'ALGORITHM': 'HS256',
-    'SIGNING_KEY': SECRET_KEY,  # Use the fetched SECRET_KEY here
+    'SIGNING_KEY': 'SECRET_KEY',  
     'VERIFYING_KEY': None,
     'AUDIENCE': None,
     'ISSUER': None,
