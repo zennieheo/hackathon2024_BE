@@ -37,7 +37,6 @@ def root_view(request): #http://127.0.0.1:8000/ 에 뜨는 첫 화면 세팅인�
     return JsonResponse({"message": "Welcome to the API!"})
 
 
-
 # apiview를 사용한 댓글 생성 api
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -174,17 +173,6 @@ class PostDetailAPIView(APIView):
            
 
 
-
-
-
-
-
-
-
-
-
-
-# ayyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
 
 
 # Register API _________added!!!!!!!!
