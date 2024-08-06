@@ -4,6 +4,9 @@ from rest_framework import status
 from .models import Board, Post, Comment
 from .serializers import BoardSerializer, PostSerializer, CommentSerializer
 
+from django.shortcuts import get_object_or_404
+
+
 class BoardViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Board.objects.all()
     serializer_class = BoardSerializer
@@ -32,12 +35,14 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         board_id = self.kwargs.get('board_id')
+        # board_id = self.request.data.get('board_id')
         if board_id:
             serializer.save(board_id=board_id)
         else:
             # 게시판 ID가 없는 경우 오류를 반환합니다.
             raise ValueError("게시판 ID를 제공해야 합니다.")
-
+        
+    
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
