@@ -4,8 +4,6 @@ from rest_framework import status
 from .models import Board, Post, Comment
 from .serializers import BoardSerializer, PostSerializer, CommentSerializer
 
-from django.shortcuts import get_object_or_404
-
 
 class BoardViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Board.objects.all()
