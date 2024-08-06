@@ -55,9 +55,8 @@ class RegisterSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['name', 'email', 'activity_level', 'height', 'weight', 'username', 'password', 'required_intake']
-        
-    
+        fields = ['name', 'email', 'activity_level', 'height', 'weight', 'username', 'required_intake']
+
 
 class FoodIntakeSerializer(serializers.ModelSerializer):
     class Meta:

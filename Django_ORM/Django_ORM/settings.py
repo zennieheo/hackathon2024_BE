@@ -14,14 +14,11 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('DATABASE_NAME'),
-        'USER': os.getenv('DATABASE_USER'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD'),
-        'HOST': os.getenv('DATABASE_HOST'),
-        'PORT': os.getenv('DATABASE_PORT'),
+        'ENGINE': 'django.db.backends.sqlite3',  # SQLite 엔진으로 변경
+        'NAME': BASE_DIR / 'db.sqlite3',  # 데이터베이스 파일 경로
     }
 }
+
 
 
 
